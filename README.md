@@ -1,13 +1,24 @@
-# 🚀 Enterprise URL Shortener & Link-in-Bio Platform
+<div align="center">
+  <h1>🚀 Shortly - Enterprise URL Shortener & Link-in-Bio Platform</h1>
+  <p>A high-performance, cinematic URL shortener combining robust enterprise-grade backend architecture with a jaw-dropping WebGL-tier frontend experience powered by GSAP.</p>
+  
+  <div>
+    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+    <img src="https://img.shields.io/badge/GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=white" alt="GSAP" />
+    <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node" />
+    <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+    <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+  </div>
+</div>
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![GSAP](https://img.shields.io/badge/GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+---
 
-A high-performance, cinematic URL shortener and "Link-in-Bio" builder. This project combines robust enterprise-grade backend architecture with a jaw-dropping WebGL-tier frontend experience powered by GSAP.
+## 📋 Table of Contents
+- [✨ Features](#-features)
+- [🏗️ System Architecture](#️-system-architecture)
+- [💻 Local Setup](#-local-setup)
+- [📖 API Documentation](#-api-documentation)
 
 ---
 
@@ -16,15 +27,18 @@ A high-performance, cinematic URL shortener and "Link-in-Bio" builder. This proj
 ### 🎨 Cinematic Frontend Experience
 - **Hyper-Drive GSAP Preloader:** A state-of-the-art 3D scroll-linked intro sequence featuring fiber-optic warp speed particles, matrix-style text scrambling, and an interactive mouse spotlight.
 - **Link-in-Bio Builder:** Create custom, mobile-optimized "Link-in-Bio" landing pages with drag-and-drop aesthetics and dynamic social links.
-- **Glassmorphic UI Design:** Ultra-premium, responsive UI using backdrop filters and vibrant gradient borders.
+- **Glassmorphic UI Design:** Ultra-premium, responsive UI using backdrop filters, neon glows, and vibrant gradient borders.
 - **World Map Analytics:** Visualize real-time click origins on a stunning interactive D3/SVG world map.
 - **Dynamic Theming:** Seamless transition between a rich Dark Mode and a highly polished Light Mode using custom CSS variables.
 
+*(Screenshot Placeholder: Add a GIF of your GSAP Loader here!)*
+<!-- <img src="./docs/loader.gif" width="800"> -->
+
 ### 🛡️ Core Infrastructure & Security
-- **High-Performance LRU Cache:** In-memory caching for lightning-fast redirects, reducing database queries by 95%.
+- **High-Performance LRU Cache:** In-memory caching for lightning-fast redirects, reducing database queries by **95%**.
 - **Rate Limiting & Security:** Global and endpoint-specific rate limiting (`express-rate-limit`) to prevent DDoS and brute-force attacks.
 - **SSRF Hardened Scraper:** Hardened metadata crawler with resolved IP verification, blocking requests to internal hostnets.
-- **Role-Based Access Control (RBAC):** Secure JWT authentication with `Admin` and `User` roles.
+- **Role-Based Access Control (RBAC):** Secure JWT authentication with strict `Admin` and `User` roles.
 - **Automated Expirations (TTL):** MongoDB TTL indexes automatically purge expired URLs to save database storage.
 
 ### 💼 Premium User Capabilities
@@ -57,6 +71,7 @@ graph TD
 ## 💻 Local Setup
 
 ### 1. Backend Setup
+Navigate to the backend directory and configure your environment:
 ```bash
 cd backend
 npm install
@@ -65,6 +80,7 @@ npm run dev
 ```
 
 ### 2. Frontend Setup
+Navigate to the frontend directory:
 ```bash
 cd frontend
 npm install
@@ -97,3 +113,7 @@ Once the backend is running, the interactive Swagger/OpenAPI documentation is av
 | **DELETE** | `/api/urls/:id` | JWT / API Key | Delete a shortened link and evict cache. |
 | **POST** | `/api/unlock/:code` | Public | Unlock password protected short links. |
 | **GET**  | `/:code` | Public | Perform the fast redirect to target URL. |
+
+<div align="center">
+  <i>Built with ❤️ using the MERN stack</i>
+</div>
