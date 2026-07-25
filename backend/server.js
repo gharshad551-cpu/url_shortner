@@ -123,20 +123,27 @@ app.use('/', urlRoutes);
 // Global Error Handler
 app.use(errorHandler);
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-const gracefulShutdown = () => {
-  console.log('Received kill signal, shutting down gracefully');
-  server.close(() => {
-    console.log('Closed out remaining connections');
-    mongoose.connection.close(false).then(() => {
-      console.log('MongoDB connection closed');
-      process.exit(0);
-    });
+let server;
+if (process.env.NODE_ENV !== 'production') {
+  server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
-};
 
-process.on('SIGTERM', gracefulShutdown);
-process.on('SIGINT', gracefulShutdown);
+  const gracefulShutdown = () => {
+    console.log('Received kill signal, shutting down gracefully');
+    if (server) {
+      server.close(() => {
+        console.log('Closed out remaining connections');
+        mongoose.connection.close(false).then(() => {
+          console.log('MongoDB connection closed');
+          process.exit(0);
+        });
+      });
+    }
+  };
+
+  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', gracefulShutdown);
+}
+
+module.exports = app;
