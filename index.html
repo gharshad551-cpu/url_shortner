@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseLink - Next-Gen URL Shortener & Analytics Platform</title>
+    <meta name="description" content="Transform long URLs into powerful, trackable short links. Generate QR codes, set custom aliases, password protection, and analyze real-time engagement data.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+    <!-- Background Animated Glow Spheres -->
+    <div class="bg-blur-container">
+        <div class="glow-sphere sphere-1"></div>
+        <div class="glow-sphere sphere-2"></div>
+        <div class="glow-sphere sphere-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Pulse<span class="highlight">Link</span></span>
+                    <span class="brand-badge">PRO v2.5</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-tab active" data-tab="shorten">
+                    <i class="fa-solid fa-link"></i> Shorten
+                </button>
+                <button class="nav-tab" data-tab="batch">
+                    <i class="fa-solid fa-layer-group"></i> Batch URL
+                </button>
+                <button class="nav-tab" data-tab="analytics">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
+                </button>
+                <button class="nav-tab" data-tab="qrcode">
+                    <i class="fa-solid fa-qrcode"></i> QR Studio
+                </button>
+                <button class="nav-tab" data-tab="history">
+                    <i class="fa-solid fa-clock-rotate-left"></i> History <span class="badge-count" id="linkCountBadge">0</span>
+                </button>
+            </nav>
+
+            <div class="header-actions">
+                <button class="btn btn-secondary btn-icon-only" id="themeToggleBtn" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="btn btn-gradient" id="btnQuickDemo">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Load Demo Data
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-container">
+        
+        <!-- SECTION 1: SINGLE URL SHORTENER -->
+        <section id="shortenSection" class="tab-content active">
+            <div class="hero-section">
+                <div class="hero-tag">
+                    <i class="fa-solid fa-shield-halved"></i> Fast • Secure • Built-in Telemetry
+                </div>
+                <h1 class="hero-title">Shorten, Share & Track Your <span class="gradient-text">Links Instantly</span></h1>
+                <p class="hero-subtitle">Turn lengthy web addresses into clean, memorable links with custom aliases, password protection, and live click telemetry.</p>
+            </div>
+
+            <!-- Main Input Card -->
+            <div class="card card-glow main-shortener-card">
+                <form id="urlForm" class="shortener-form">
+                    <div class="input-group-hero">
+                        <div class="input-icon"><i class="fa-solid fa-globe"></i></div>
+                        <input type="url" id="longUrlInput" placeholder="Paste a long URL here (e.g. https://github.com/my-awesome-project/v2/docs)..." required autocomplete="off">
+                        <button type="submit" class="btn btn-primary btn-hero">
+                            <span>Shorten URL</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Advanced Options Toggle -->
+                    <div class="options-toggle-container">
+                        <button type="button" id="toggleAdvOptions" class="btn-text-toggle">
+                            <i class="fa-solid fa-sliders"></i> Advanced Link Options <i class="fa-solid fa-chevron-down toggle-arrow"></i>
+                        </button>
+                    </div>
+
+                    <!-- Advanced Options Drawer -->
+                    <div id="advOptionsDrawer" class="advanced-options-drawer hidden">
+                        <div class="options-grid">
+                            <!-- Custom Domain / Prefix -->
+                            <div class="option-field">
+                                <label for="domainSelect"><i class="fa-solid fa-server"></i> Domain Prefix</label>
+                                <select id="domainSelect" class="custom-select">
+                                    <option value="pulse.link/">pulse.link/</option>
+                                    <option value="snap.url/">snap.url/</option>
+                                    <option value="go.dev/">go.dev/</option>
+                                    <option value="trim.io/">trim.io/</option>
+                                </select>
+                            </div>
+
+                            <!-- Custom Alias -->
+                            <div class="option-field">
+                                <label for="customAliasInput"><i class="fa-solid fa-pen-nib"></i> Custom Alias / Backhalf</label>
+                                <div class="prefix-input">
+                                    <span class="input-prefix" id="selectedDomainPrefix">pulse.link/</span>
+                                    <input type="text" id="customAliasInput" placeholder="e.g. summer-sale-2026" pattern="[a-zA-Z0-9_-]+" title="Only alphanumeric, dashes, and underscores allowed">
+                                </div>
+                            </div>
+
+                            <!-- Password Protection -->
+                            <div class="option-field">
+                                <label for="passwordInput"><i class="fa-solid fa-lock"></i> Passcode Protection (Optional)</label>
+                                <input type="password" id="passwordInput" placeholder="Set access password">
+                            </div>
+
+                            <!-- Expiration Date -->
+                            <div class="option-field">
+                                <label for="expirationInput"><i class="fa-regular fa-calendar-xmark"></i> Expiration Date (Optional)</label>
+                                <input type="datetime-local" id="expirationInput">
+                            </div>
+
+                            <!-- UTM Tag Builder -->
+                            <div class="option-field full-width">
+                                <label><i class="fa-solid fa-tags"></i> UTM Campaign Builder (Optional)</label>
+                                <div class="utm-grid">
+                                    <input type="text" id="utmSource" placeholder="utm_source (e.g. twitter)">
+                                    <input type="text" id="utmMedium" placeholder="utm_medium (e.g. social)">
+                                    <input type="text" id="utmCampaign" placeholder="utm_campaign (e.g. launch)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Result Card (Shown after creation) -->
+                <div id="resultBox" class="result-container hidden">
+                    <div class="result-header">
+                        <span class="status-pill status-success"><i class="fa-solid fa-circle-check"></i> Link Created Successfully</span>
+                        <span class="result-time" id="resultTimestamp">Just now</span>
+                    </div>
+
+                    <div class="result-body">
+                        <div class="short-url-box">
+                            <span class="short-url-text" id="createdShortUrl">pulse.link/xyz123</span>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-accent" id="btnCopyShortUrl">
+                                    <i class="fa-regular fa-copy"></i> Copy
+                                </button>
+                                <button class="btn btn-sm btn-secondary" id="btnTestRedirect" title="Test Redirection">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit
+                                </button>
+                                <button class="btn btn-sm btn-secondary" id="btnQuickQr">
+                                    <i class="fa-solid fa-qrcode"></i> QR
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="original-url-info">
+                            <i class="fa-solid fa-turn-up-right"></i> Points to: <a id="createdOriginalUrl" href="#" target="_blank" class="truncate-link">https://example.com</a>
+                        </div>
+
+                        <div class="result-meta-tags" id="resultMetaTags">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Highlights Grid -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon icon-purple"><i class="fa-solid fa-chart-pie"></i></div>
+                    <h3>Deep Telemetry</h3>
+                    <p>Track clicks by country, device, browser, and traffic referrers in real time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon icon-cyan"><i class="fa-solid fa-qrcode"></i></div>
+                    <h3>Smart QR Codes</h3>
+                    <p>Generate high-res vector QR codes with custom styling, colors, and embedded icons.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon icon-emerald"><i class="fa-solid fa-vault"></i></div>
+                    <h3>Secure & Expirable</h3>
+                    <p>Lock sensitive links behind passwords or set auto-expire timers for transient campaigns.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: BATCH URL SHORTENER -->
+        <section id="batchSection" class="tab-content hidden">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-layer-group"></i> Batch URL Shortener</h2>
+                <p>Paste multiple links at once (one per line) to bulk-generate shortened URLs instantly.</p>
+            </div>
+
+            <div class="card">
+                <div class="batch-input-area">
+                    <label for="batchTextarea" class="input-label">Paste Long URLs (Max 20 at once):</label>
+                    <textarea id="batchTextarea" rows="8" placeholder="https://example.com/page1&#10;https://example.com/page2&#10;https://github.com/popular/repo"></textarea>
+                    <div class="batch-actions">
+                        <button class="btn btn-primary" id="btnProcessBatch">
+                            <i class="fa-solid fa-bolt"></i> Shorten All URLs
+                        </button>
+                        <button class="btn btn-secondary" id="btnClearBatch">
+                            <i class="fa-solid fa-trash-can"></i> Clear Input
+                        </button>
+                    </div>
+                </div>
+
+                <div id="batchResultContainer" class="batch-results hidden">
+                    <div class="table-toolbar">
+                        <span class="toolbar-title" id="batchResultCount">Processed Links</span>
+                        <button class="btn btn-sm btn-secondary" id="btnExportBatchCsv">
+                            <i class="fa-solid fa-file-csv"></i> Export CSV
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="batchTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Original URL</th>
+                                    <th>Short Link</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batchTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ANALYTICS DASHBOARD -->
+        <section id="analyticsSection" class="tab-content hidden">
+            <div class="analytics-header">
+                <div>
+                    <h2><i class="fa-solid fa-chart-line"></i> Analytics & Telemetry Dashboard</h2>
+                    <p>Select a link to inspect traffic performance, devices, and audience insights.</p>
+                </div>
+
+                <div class="analytics-selector">
+                    <label for="linkSelectAnalytics"><i class="fa-solid fa-filter"></i> Select Link:</label>
+                    <select id="linkSelectAnalytics" class="custom-select">
+                        <option value="all">-- All Links Combined --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Stats KPI Cards Row -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-mouse-pointer"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Clicks</span>
+                        <span class="stat-value" id="kpiTotalClicks">0</span>
+                    </div>
+                    <span class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +18.4%</span>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-link"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Active Short Links</span>
+                        <span class="stat-value" id="kpiActiveLinks">0</span>
+                    </div>
+                    <span class="stat-trend neutral"><i class="fa-solid fa-shield"></i> 100% Live</span>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-amber"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Unique Visitors</span>
+                        <span class="stat-value" id="kpiUniqueVisitors">0</span>
+                    </div>
+                    <span class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +12.1%</span>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-emerald"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Avg. Response Time</span>
+                        <span class="stat-value" id="kpiAvgTime">14ms</span>
+                    </div>
+                    <span class="stat-trend positive"><i class="fa-solid fa-check"></i> Ultra-Fast</span>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <!-- Clicks Over Time Line Chart -->
+                <div class="card chart-card full-width">
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-chart-area"></i> Click Activity Timeline</h3>
+                        <div class="chart-timeframe">
+                            <button class="time-btn active">Last 7 Days</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Device Breakdown Doughnut -->
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-mobile-screen-button"></i> Device Type</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Traffic Referrers Bar Chart -->
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-share-nodes"></i> Top Referrers</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="referrerChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Clicks Activity Table -->
+            <div class="card mt-6">
+                <div class="table-toolbar">
+                    <h3><i class="fa-solid fa-list-check"></i> Live Click Telemetry Log</h3>
+                    <button class="btn btn-sm btn-secondary" id="btnClearLogs">
+                        <i class="fa-solid fa-broom"></i> Clear Logs
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Link Alias</th>
+                                <th>Referrer</th>
+                                <th>Device</th>
+                                <th>Location</th>
+                                <th>IP Hash</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clickLogsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: QR STUDIO -->
+        <section id="qrcodeSection" class="tab-content hidden">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-qrcode"></i> Dynamic QR Code Studio</h2>
+                <p>Customize, generate, and download styled QR codes for marketing collaterals.</p>
+            </div>
+
+            <div class="qr-studio-layout">
+                <!-- Controls Card -->
+                <div class="card qr-controls-card">
+                    <h3><i class="fa-solid fa-sliders"></i> QR Configuration</h3>
+
+                    <div class="option-field">
+                        <label for="qrSelectLink">Target Short Link</label>
+                        <select id="qrSelectLink" class="custom-select">
+                            <option value="">-- Choose from saved links --</option>
+                        </select>
+                    </div>
+
+                    <div class="option-field">
+                        <label for="qrCustomUrlInput">Or Enter Custom URL</label>
+                        <input type="url" id="qrCustomUrlInput" placeholder="https://..." value="https://pulse.link/demo">
+                    </div>
+
+                    <div class="options-grid">
+                        <div class="option-field">
+                            <label for="qrFgColor">Foreground Color</label>
+                            <input type="color" id="qrFgColor" value="#6366f1" class="color-picker">
+                        </div>
+
+                        <div class="option-field">
+                            <label for="qrBgColor">Background Color</label>
+                            <input type="color" id="qrBgColor" value="#0f172a" class="color-picker">
+                        </div>
+                    </div>
+
+                    <div class="option-field">
+                        <label for="qrSizeSelect">Code Size / Resolution</label>
+                        <select id="qrSizeSelect" class="custom-select">
+                            <option value="200">200 x 200 px (Standard)</option>
+                            <option value="300" selected>300 x 300 px (High Res)</option>
+                            <option value="500">500 x 500 px (Ultra HD)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary btn-full mt-4" id="btnGenerateQr">
+                        <i class="fa-solid fa-arrows-rotate"></i> Regenerate QR Code
+                    </button>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="card qr-preview-card">
+                    <h3><i class="fa-solid fa-eye"></i> Live QR Preview</h3>
+                    <div class="qr-display-box" id="qrDisplayBox">
+                        <div id="qrcodeTarget"></div>
+                    </div>
+                    <div class="qr-actions">
+                        <button class="btn btn-accent" id="btnDownloadQr">
+                            <i class="fa-solid fa-download"></i> Download PNG
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: LINK HISTORY & MANAGEMENT -->
+        <section id="historySection" class="tab-content hidden">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fa-solid fa-clock-rotate-left"></i> Link Management & History</h2>
+                    <p>Manage all your shortened links, search, filter, edit password settings, or delete.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btnExportJson">
+                        <i class="fa-solid fa-file-export"></i> Export JSON
+                    </button>
+                    <button class="btn btn-secondary" id="btnImportJson">
+                        <i class="fa-solid fa-file-import"></i> Import JSON
+                    </button>
+                    <input type="file" id="importFileInput" accept=".json" class="hidden">
+                    <button class="btn btn-danger" id="btnClearAllLinks">
+                        <i class="fa-solid fa-trash-can"></i> Delete All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="card search-filter-card">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="historySearchInput" placeholder="Search by short link, target URL, or tag...">
+                </div>
+            </div>
+
+            <!-- Links Table -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="data-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Short URL</th>
+                                <th>Target Destination</th>
+                                <th>Clicks</th>
+                                <th>Created</th>
+                                <th>Protection</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Simulated Redirection & Password Verification Modal -->
+    <div id="passwordModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <i class="fa-solid fa-shield-halved modal-icon"></i>
+                <h3>Protected Link</h3>
+                <p>This URL is password protected. Enter the passcode to continue.</p>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <input type="password" id="modalPasswordInput" placeholder="Enter password...">
+                </div>
+                <div id="modalErrorMsg" class="error-msg hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Incorrect password. Please try again.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnModalCancel">Cancel</button>
+                <button class="btn btn-primary" id="btnModalSubmit">Access Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification System -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 PulseLink Engine • Built with high-performance vanilla web tech & glassmorphism UX.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
